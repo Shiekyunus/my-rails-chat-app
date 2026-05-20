@@ -1,0 +1,35 @@
+<h1>Users</h1>
+
+<%= current_user.name  %> | <%= current_user.email  %><%= button_to "Logout",
+              destroy_user_session_path,
+              method: :delete %>
+
+
+<h2>Search User</h2>
+
+<%= form_with url: search_users_path,
+              method: :get,
+              local: true do |f| %>
+
+  <%= f.text_field :email %>
+
+  <%= f.submit "Search" %>
+
+<% end %>
+
+<hr>
+
+<% @users.each do |user| %>
+
+  <div>
+    <strong><%= user.name %></strong>
+    <%= user.email %>
+
+    <%= button_to "Chat",
+                  conversations_path(receiver_id: user.id),
+                  method: :post %>
+  </div>
+
+  <hr>
+
+<% end %>

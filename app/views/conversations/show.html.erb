@@ -1,0 +1,28 @@
+<h1>Chat Room</h1>
+
+<hr>
+
+<% @messages.each do |message| %>
+
+  <p>
+    <strong><%= message.user.name%>:</strong>
+    <%= message.body %>
+  </p>
+
+<% end %>
+
+
+
+<%= form_with model: [@conversation, @message] do |f| %>
+
+  <div>
+    <%= f.text_area :body %>
+  </div>
+
+  <div>
+    <%= f.submit "Send" %>
+  </div>
+
+  <%= link_to "Back to Home",users_path %>
+
+<% end %>

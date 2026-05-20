@@ -1,0 +1,54 @@
+<h1>Search Result</h1>
+
+<% if @searched_user %>
+
+  <h3>
+    <%= @searched_user.name %>
+  </h3>
+
+  <p>
+    <%= @searched_user.email %>
+  </p>
+
+  <hr>
+
+  <% @conversations.each do |conversation| %>
+
+    <% other_user =
+         conversation.users.where.not(id: @searched_user.id).first %>
+
+    <% sent_count =
+         conversation.messages.where(user: @searched_user).count %>
+
+    <% received_count =
+         conversation.messages.where(user: other_user).count %>
+
+    <div>
+
+      <strong>
+        <%= other_user.name %>
+      </strong>
+
+      <br>
+
+      Sent:
+      <%= sent_count %>
+
+      <br>
+
+      Received:
+      <%= received_count %>
+
+    </div>
+
+    <hr>
+
+  <% end %>
+
+<% else %>
+
+  <p>User not found</p>
+
+<% end %>
+
+<%= link_to "Back to Home",users_path %>

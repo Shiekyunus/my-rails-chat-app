@@ -1,0 +1,10 @@
+# Default ignored files
+/../../Chat Application /.idea/shelf/
+/../../Chat Application /.idea/workspace.xml
+# Ignored default folder with query files
+/../../Chat Application /.idea/queries/
+# Datasource local storage ignored files
+/../../Chat Application /.idea/dataSources/
+/../../Chat Application /.idea/dataSources.local.xml
+# Editor-based HTTP Client requests
+/../../Chat Application /.idea/httpRequests/
