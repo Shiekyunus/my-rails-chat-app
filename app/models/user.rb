@@ -9,4 +9,5 @@ class User < ApplicationRecord
   has_many :conversation_participants
   has_many :conversations, through: :conversation_participants
   has_many :messages
+  has_one_attached :profile_image
 end

@@ -1,9 +1,50 @@
-<h1>Users</h1>
+<div style="display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 15px;
+  border-bottom: 1px solid gray;">
 
-<%= current_user.name  %> | <%= current_user.email  %><%= button_to "Logout",
-              destroy_user_session_path,
-              method: :delete %>
+  <h1>Users</h1>
 
+  <div style="display: flex;
+    align-items: center;
+    gap: 10px;">
+
+    <% if current_user.profile_image.attached? %>
+
+      <%= image_tag current_user.profile_image,
+                    width: 50,
+                    height: 50,
+                    style: "border-radius: 50%; object-fit: cover;" %>
+    <% else %>
+
+      <%= image_tag "default profile image.webp",
+                    width: 50,
+                    height: 50,
+                    style: "border-radius: 50%; object-fit: cover;"%>
+
+    <% end %>
+
+    <strong>
+      <%= current_user.name %>
+    </strong>
+
+    |
+
+    <%= current_user.email %>
+
+    <%= link_to "Edit Profile",
+                edit_user_registration_path %>
+
+    <%= button_to "Logout",
+                  destroy_user_session_path,
+                  method: :delete %>
+
+  </div>
+
+</div>
+
+<br>
 
 <h2>Search User</h2>
 
@@ -11,7 +52,8 @@
               method: :get,
               local: true do |f| %>
 
-  <%= f.text_field :email %>
+  <%= f.text_field :email,
+                   placeholder: "Enter email" %>
 
   <%= f.submit "Search" %>
 
@@ -21,13 +63,43 @@
 
 <% @users.each do |user| %>
 
-  <div>
-    <strong><%= user.name %></strong>
-    <%= user.email %>
+  <div style="display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;">
 
-    <%= button_to "Chat",
-                  conversations_path(receiver_id: user.id),
-                  method: :post %>
+    <% if user.profile_image.attached? %>
+
+      <%= image_tag user.profile_image,
+                    width: 70,
+                    height: 70,
+                    style: "border-radius: 50%; object-fit: cover;" %>
+
+    <% else %>
+
+      <%= image_tag "default profile image.webp",
+                    width: 70,
+                    height: 70,
+                    style: "border-radius: 50%; object-fit: cover;"%>
+
+    <% end %>
+
+    <div>
+
+      <h3 style="margin: 0;">
+        <%= user.name %>
+      </h3>
+
+      <p style="margin: 5px 0;">
+        <%= user.email %>
+      </p>
+
+      <%= button_to "Chat",
+                    conversations_path(receiver_id: user.id),
+                    method: :post %>
+
+    </div>
+
   </div>
 
   <hr>
