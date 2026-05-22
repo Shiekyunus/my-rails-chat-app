@@ -33,9 +33,19 @@ class ConversationsController < ApplicationController
 
   def show
     @conversation = Conversation.find(params[:id])
-
     @messages = @conversation.messages.includes(:user)
-
     @message = @conversation.messages.new
+
+    @conversation.messages
+                 .where(user_id: other_participant.id, read: false)
+                 .update_all(read: true)
   end
+
+  private
+
+  def other_participant
+    @conversation.conversation_participants
+                 .where.not(user: current_user)
+                 .first.user
+    end
 end

@@ -13,8 +13,19 @@
     </small>
   </p>
 
+    <% if message.user == current_user %>
 
-    <br>
+      <% if message.read %>
+
+        ✓✓ Seen
+
+      <% else %>
+
+        ✓ Sent
+
+      <% end %>
+
+    <% end %>
 
 <% end %>
 </div>

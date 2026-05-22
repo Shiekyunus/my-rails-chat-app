@@ -1,14 +1,18 @@
 document.getElementById("messages").innerHTML += `
   <p>
-    <strong><%= @message.user.name %></strong>:
+
+    <strong>
+      <%= @message.user.name %>
+    </strong>
+
+    :
+
     <%= j @message.body %>
-  </p>
 
-  <small>
-    <%= @message.created_at.strftime("%d %b %Y, %I:%M %p") %>
-  </small>
-
-  <br><br>
+    <small>
+      (<%= @message.created_at.strftime("%d %b %Y, %I:%M %p") %>)
+    </small></p>
+  ✓ Sent
 `;
 
 document.querySelector("textarea").value = "";
