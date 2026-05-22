@@ -1,23 +1,37 @@
-document.getElementById("messages").innerHTML += `
-  <p>
+var messages = document.getElementById("messages");
 
-    <strong>
-      <%= @message.user.name %>
-    </strong>
+messages.innerHTML += `
+  <div class="mb-4">
 
-    :
+    <div class="text-end">
 
-    <%= j @message.body %>
+      <small class="text-muted d-block mb-1">
+        <%= @message.created_at.strftime("%d %b %Y, %I:%M %p") %>
+      </small>
 
-    <small>
-      (<%= @message.created_at.strftime("%d %b %Y, %I:%M %p") %>)
-    </small></p>
-  ✓ Sent
+      <div class="d-inline-block p-3 rounded bg-primary text-white">
+
+        <strong>
+          <%= @message.user.name %>
+        </strong>
+
+        <br>
+
+        <%= j @message.body %>
+
+      </div>
+
+      <small class="d-block mt-1 text-muted">
+        ✓ Sent
+      </small>
+
+    </div>
+
+  </div>
 `;
 
 document.querySelector("textarea").value = "";
 
-window.scrollTo(
-  0,
-  document.body.scrollHeight
-);
+var chatBox = document.getElementById("messages");
+
+chatBox.scrollTop = chatBox.scrollHeight;

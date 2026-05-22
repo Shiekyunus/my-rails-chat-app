@@ -1,60 +1,161 @@
-<h1>Chat Room</h1>
+<div class="d-flex justify-content-between align-items-center mb-4 ">
 
-<hr>
-<div id="messages">
-<% @messages.each do |message| %>
+  <h2 class="fw-bold">
+    Chat Room
+  </h2>
 
-  <p>
-    <strong><%= message.user.name%></strong>:
-    <%= message.body %>   <br>
+  <%= link_to "Back to Home",
+              users_path,
+              class: "btn btn-outline-secondary" %>
 
-    <small>
-       (<%= message.created_at.strftime("%d %b %Y, %I:%M %p") %>)
-    </small>
-  </p>
+</div>
 
-    <% if message.user == current_user %>
+<div class="card shadow-sm">
+<!--  FILTER MESSAGES-->
+  <div class="card p-2 mb-3">
 
-      <% if message.read %>
+    <div class="d-flex align-items-end gap-2 flex-wrap">
 
-        ✓✓ Seen
+      <div>
 
-      <% else %>
+        <label class="form-label small mb-1">
+          From
+        </label>
 
-        ✓ Sent
+        <%= date_field_tag :from_date,
+                           params[:from_date],
+                           class: "form-control form-control-sm" %>
 
-      <% end %>
+      </div>
+
+      <div>
+
+        <label class="form-label small mb-1">
+          To
+        </label>
+
+        <%= date_field_tag :to_date,
+                           params[:to_date],
+                           class: "form-control form-control-sm" %>
+
+      </div>
+
+      <div class="mb-1">
+
+        <%= submit_tag "Filter",
+                       class: "btn btn-primary btn-sm" %>
+
+      </div>
+
+      <div class="mb-1">
+
+        <%= link_to "Clear",
+                    conversation_path(@conversation),
+                    class: "btn btn-secondary btn-sm" %>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="card-body"
+       id="messages"
+       style="height: 500px; overflow-y: auto;">
+
+    <% @messages.each do |message| %>
+
+      <div class="mb-4">
+
+        <div class="<%= message.user == current_user ? 'text-end' : 'text-start' %>">
+
+          <!-- TIME -->
+
+          <small class="text-muted d-block mb-1">
+
+            <%= message.created_at.strftime("%d %b %Y, %I:%M %p") %>
+
+          </small>
+
+          <!-- MESSAGE BUBBLE -->
+
+          <div class="d-inline-block p-3 rounded
+        <%= message.user == current_user ?
+                                    'bg-primary text-white' :
+                                    'bg-secondary text-white' %>">
+
+            <strong>
+              <%= message.user.name %>
+            </strong>
+
+            <br>
+
+            <%= message.body %>
+
+          </div>
+
+          <!-- SENT / SEEN -->
+
+          <% if message.user == current_user %>
+
+            <small class="d-block mt-1 text-muted">
+
+              <%= message.read ? "✓✓ Seen" : "✓ Sent" %>
+
+            </small>
+
+          <% end %>
+
+        </div>
+
+      </div>
+
+    <% end %>  </div>
+
+</div>
+
+<div class="card shadow-sm mt-3">
+
+  <div class="card-body">
+
+    <%= form_with model: [@conversation, @message],
+                  local: false do |f| %>
+
+      <div class="row g-2">
+
+        <div class="col-md-10">
+
+          <%= f.text_area :body,
+                          rows: 2,
+                          placeholder: "Type your message...",
+                          class: "form-control" %>
+
+        </div>
+
+        <div class="col-md-2 d-grid">
+
+          <%= f.submit "Send",
+                       class: "btn btn-success" %>
+
+        </div>
+
+      </div>
 
     <% end %>
 
-<% end %>
+  </div>
+
 </div>
-
-
-
-<%= form_with model: [@conversation, @message], local: false   do |f| %>
-
-  <div>
-    <%= f.text_area :body %>
-  </div>
-
-  <div>
-    <%= f.submit "Send" %>
-  </div>
-
-
-
-<% end %>
-<%= link_to "Back to Home",users_path %>
 
 <script>
 
     function scrollToBottom() {
 
-        window.scrollTo(
-            0,
-            document.body.scrollHeight
-        );
+        const messagesDiv =
+            document.getElementById("messages");
+
+        messagesDiv.scrollTop =
+            messagesDiv.scrollHeight;
 
     }
 

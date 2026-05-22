@@ -10,4 +10,15 @@ class User < ApplicationRecord
   has_many :conversations, through: :conversation_participants
   has_many :messages
   has_one_attached :profile_image
+
+  after_create :send_welcome_email
+
+  private
+
+  def send_welcome_email
+
+    UserMailer.welcome_email(self)
+              .deliver_later
+
+  end
 end

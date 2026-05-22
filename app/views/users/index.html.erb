@@ -1,108 +1,88 @@
-<div style="display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-bottom: 15px;
-  border-bottom: 1px solid gray;">
+<div class="d-flex justify-content-between align-items-center pb-3 border-bottom">
 
-  <h1>Users</h1>
+  <h1>
+    Users
+  </h1>
 
-  <div style="display: flex;
-    align-items: center;
-    gap: 10px;">
-
-    <% if current_user.profile_image.attached? %>
-
-      <%= image_tag current_user.profile_image,
-                    width: 50,
-                    height: 50,
-                    style: "border-radius: 50%; object-fit: cover;" %>
-    <% else %>
-
-      <%= image_tag "default profile image.webp",
-                    width: 50,
-                    height: 50,
-                    style: "border-radius: 50%; object-fit: cover;"%>
-
-    <% end %>
-
-    <strong>
-      <%= current_user.name %>
-    </strong>
-
-    |
-
-    <%= current_user.email %>
-
-    <%= link_to "Edit Profile",
-                edit_user_registration_path %>
-
-    <%= button_to "Logout",
-                  destroy_user_session_path,
-                  method: :delete %>
-
-  </div>
 
 </div>
 
-<br>
+<div class="card p-3 mb-4">
 
-<h2>Search User</h2>
+  <h4 class="mb-3">
+    Search User
+  </h4>
 
-<%= form_with url: search_users_path,
-              method: :get,
-              local: true do |f| %>
+  <%= form_with url: search_users_path,
+                method: :get,
+                local: true,
+                class: "row g-2" do |f| %>
 
-  <%= f.text_field :email,
-                   placeholder: "Enter email" %>
+    <div class="col-md-4">
 
-  <%= f.submit "Search" %>
+      <%= f.text_field :email,
+                       placeholder: "Enter email",
+                       class: "form-control" %>
 
-<% end %>
+    </div>
 
-<hr>
+    <div class="col-md-2">
+
+      <%= f.submit "Search",
+                   class: "btn btn-primary w-100" %>
+
+    </div>
+
+  <% end %>
+
+</div>
 
 <% @users.each do |user| %>
 
-  <div style="display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 20px;">
+  <div class="card mb-3">
 
-    <% if user.profile_image.attached? %>
+    <div class="card-body d-flex align-items-center justify-content-between">
 
-      <%= image_tag user.profile_image,
-                    width: 70,
-                    height: 70,
-                    style: "border-radius: 50%; object-fit: cover;" %>
+      <div class="d-flex align-items-center gap-3">
 
-    <% else %>
+        <% if user.profile_image.attached? %>
 
-      <%= image_tag "default profile image.webp",
-                    width: 70,
-                    height: 70,
-                    style: "border-radius: 50%; object-fit: cover;"%>
+          <%= image_tag user.profile_image,
+                        width: 70,
+                        height: 70,
+                        class: "rounded-circle" %>
 
-    <% end %>
+        <% else %>
 
-    <div>
+          <%= image_tag "default profile image.webp",
+                        width: 70,
+                        height: 70,
+                        class: "rounded-circle" %>
 
-      <h3 style="margin: 0;">
-        <%= user.name %>
-      </h3>
+        <% end %>
 
-      <p style="margin: 5px 0;">
-        <%= user.email %>
-      </p>
+        <div>
+
+          <h4 class="mb-1">
+            <%= user.name %>
+          </h4>
+
+          <p class="mb-1 text-muted">
+            <%= user.email %>
+          </p>
+
+        </div>
+
+      </div>
 
       <%= button_to "Chat",
                     conversations_path(receiver_id: user.id),
-                    method: :post %>
+                    method: :post,
+                    class: "btn btn-success" %>
 
     </div>
 
   </div>
-
-  <hr>
 
 <% end %>
 

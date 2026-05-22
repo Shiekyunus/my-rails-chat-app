@@ -32,13 +32,37 @@ class ConversationsController < ApplicationController
   end
 
   def show
+
     @conversation = Conversation.find(params[:id])
-    @messages = @conversation.messages.includes(:user)
+
+    @messages = @conversation.messages
+                             .includes(:user)
+                             .order(created_at: :asc)
+
+    if params[:from_date].present? &&
+       params[:to_date].present?
+
+      from_date =
+        Date.parse(params[:from_date]).beginning_of_day
+
+      to_date =
+        Date.parse(params[:to_date]).end_of_day
+
+      @messages = @messages.where(
+        created_at: from_date..to_date
+      )
+
+    end
+
     @message = @conversation.messages.new
 
     @conversation.messages
-                 .where(user_id: other_participant.id, read: false)
+                 .where(
+                   user_id: other_participant.id,
+                   read: false
+                 )
                  .update_all(read: true)
+
   end
 
   private
