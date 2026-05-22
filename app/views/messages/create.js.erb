@@ -1,0 +1,19 @@
+document.getElementById("messages").innerHTML += `
+  <p>
+    <strong><%= @message.user.name %></strong>:
+    <%= j @message.body %>
+  </p>
+
+  <small>
+    <%= @message.created_at.strftime("%d %b %Y, %I:%M %p") %>
+  </small>
+
+  <br><br>
+`;
+
+document.querySelector("textarea").value = "";
+
+window.scrollTo(
+  0,
+  document.body.scrollHeight
+);

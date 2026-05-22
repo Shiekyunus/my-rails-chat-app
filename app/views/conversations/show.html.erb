@@ -1,19 +1,27 @@
 <h1>Chat Room</h1>
 
 <hr>
-
+<div id="messages">
 <% @messages.each do |message| %>
 
   <p>
-    <strong><%= message.user.name%>:</strong>
-    <%= message.body %>
+    <strong><%= message.user.name%></strong>:
+    <%= message.body %>   <br>
+
+    <small>
+       (<%= message.created_at.strftime("%d %b %Y, %I:%M %p") %>)
+    </small>
   </p>
 
+
+    <br>
+
 <% end %>
+</div>
 
 
 
-<%= form_with model: [@conversation, @message] do |f| %>
+<%= form_with model: [@conversation, @message], local: false   do |f| %>
 
   <div>
     <%= f.text_area :body %>
@@ -23,6 +31,22 @@
     <%= f.submit "Send" %>
   </div>
 
-  <%= link_to "Back to Home",users_path %>
+
 
 <% end %>
+<%= link_to "Back to Home",users_path %>
+
+<script>
+
+    function scrollToBottom() {
+
+        window.scrollTo(
+            0,
+            document.body.scrollHeight
+        );
+
+    }
+
+    scrollToBottom();
+
+</script>
