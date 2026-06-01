@@ -1,4 +1,4 @@
-# frozen_string_literal: true
+  # frozen_string_literal: true
 
 class ConversationsController < ApplicationController
   before_action :authenticate_user!
@@ -9,7 +9,7 @@ class ConversationsController < ApplicationController
     conversation = Conversation.joins(:conversation_participants)
                                .where(conversation_participants: {
                                         user_id: [current_user.id, receiver.id]
-                                      })
+                                         })
                                .group('conversations.id')
                                .having('COUNT(conversations.id) = 2')
                                .first
@@ -32,21 +32,14 @@ class ConversationsController < ApplicationController
   end
 
   def show
-
     @conversation = Conversation.find(params[:id])
 
-    @messages = @conversation.messages
-                             .includes(:user)
-                             .order(created_at: :asc)
+    @messages = @conversation.messages.includes(:user)
 
-    if params[:from_date].present? &&
-       params[:to_date].present?
+    if params[:from_date].present? && params[:to_date].present?
 
-      from_date =
-        Date.parse(params[:from_date]).beginning_of_day
-
-      to_date =
-        Date.parse(params[:to_date]).end_of_day
+      from_date = Date.parse(params[:from_date]).beginning_of_day
+      to_date   = Date.parse(params[:to_date]).end_of_day
 
       @messages = @messages.where(
         created_at: from_date..to_date
@@ -57,12 +50,8 @@ class ConversationsController < ApplicationController
     @message = @conversation.messages.new
 
     @conversation.messages
-                 .where(
-                   user_id: other_participant.id,
-                   read: false
-                 )
+                 .where(user_id: other_participant.id, read: false)
                  .update_all(read: true)
-
   end
 
   private
@@ -71,5 +60,5 @@ class ConversationsController < ApplicationController
     @conversation.conversation_participants
                  .where.not(user: current_user)
                  .first.user
-    end
+  end
 end

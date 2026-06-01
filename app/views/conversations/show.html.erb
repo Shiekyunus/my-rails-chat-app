@@ -12,53 +12,43 @@
 
 <div class="card shadow-sm">
 <!--  FILTER MESSAGES-->
-  <div class="card p-2 mb-3">
+  <%= form_with url: conversation_path(@conversation),
+                method: :get,
+                local: true,
+                class: "row g-2 mb-3" do |f| %>
 
-    <div class="d-flex align-items-end gap-2 flex-wrap">
+    <div class="col-md-3">
 
-      <div>
+      <%= f.label :from_date, "From" ,class: "ms-2"%>
 
-        <label class="form-label small mb-1">
-          From
-        </label>
-
-        <%= date_field_tag :from_date,
-                           params[:from_date],
-                           class: "form-control form-control-sm" %>
-
-      </div>
-
-      <div>
-
-        <label class="form-label small mb-1">
-          To
-        </label>
-
-        <%= date_field_tag :to_date,
-                           params[:to_date],
-                           class: "form-control form-control-sm" %>
-
-      </div>
-
-      <div class="mb-1">
-
-        <%= submit_tag "Filter",
-                       class: "btn btn-primary btn-sm" %>
-
-      </div>
-
-      <div class="mb-1">
-
-        <%= link_to "Clear",
-                    conversation_path(@conversation),
-                    class: "btn btn-secondary btn-sm" %>
-
-      </div>
+      <%= f.date_field :from_date,
+                       value: params[:from_date],
+                       class: "form-control ms-2" %>
 
     </div>
 
-  </div>
+    <div class="col-md-3">
 
+      <%= f.label :to_date, "To" %>
+
+      <%= f.date_field :to_date,
+                       value: params[:to_date],
+                       class: "form-control" %>
+
+    </div>
+
+    <div class="col-md-2 d-flex align-items-end">
+
+      <%= f.submit "Filter",
+                   class: "btn btn-primary me-2" %>
+
+      <%= link_to "Clear",
+                  conversation_path(@conversation),
+                  class: "btn btn-secondary" %>
+
+    </div>
+
+  <% end %>
   <div class="card-body"
        id="messages"
        style="height: 500px; overflow-y: auto;">

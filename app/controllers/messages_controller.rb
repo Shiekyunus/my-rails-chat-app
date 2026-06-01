@@ -18,13 +18,11 @@ class MessagesController < ApplicationController
     )
 
     respond_to do |format|
-
       format.html do
         redirect_to conversation_path(@conversation)
       end
 
       format.js
-
     end
   end
 end

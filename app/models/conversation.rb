@@ -8,8 +8,6 @@ class Conversation < ApplicationRecord
   def other_user(current_user)
     messages.where.not(user: current_user)
             .last
-      &.user
+            &.user
   end
-
-
 end
