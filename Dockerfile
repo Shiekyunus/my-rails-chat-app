@@ -45,6 +45,7 @@ RUN yarn install --frozen-lockfile
 # Copied AFTER gem/yarn install so that app-code changes don't invalidate
 # the expensive bundle/yarn cache layers above.
 COPY . .
+RUN chmod +x bin/*
 
 RUN bundle config set --local deployment 'false'
 # ── Environment ───────────────────────────────────────────────────────────────
