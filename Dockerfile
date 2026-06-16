@@ -53,15 +53,6 @@ ENV RAILS_ENV=production \
 
 
 
-RUN DATABASE_URL=mysql2://dummy:dummy@localhost/dummy \
-    DATABASE_USER=dummy \
-    DATABASE_PASSWORD=dummy \
-    DATABASE_HOST=localhost \
-    DATABASE_NAME=dummy \
-    SECRET_KEY_BASE=75f6eb7e3aa4746833ac6785a3928123 \
-    NODE_OPTIONS="--max-old-space-size=4096" \
-    RUBYOPT="-rlogger" \
-    bundle exec rails assets:precompile
 
 # ── Asset precompilation ──────────────────────────────────────────────────────
 # DATABASE_URL and credentials are dummies — Rails boot requires them
