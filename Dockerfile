@@ -38,7 +38,8 @@ ENV RAILS_ENV=production
 ENV NODE_ENV=production
 
 # 6. Precompile assets for production inside the build stage using dummy placeholders
-RUN DATABASE_URL=mysql2://dummy_user:dummy_pass@localhost/dummy_db \
+RUN bundle lock --add-platform x86_64-linux x86_64-linux-musl && \
+    DATABASE_URL=mysql2://dummy_user:dummy_pass@localhost/dummy_db \
     DATABASE_USER=dummy \
     DATABASE_PASSWORD=dummy \
     DATABASE_HOST=localhost \
