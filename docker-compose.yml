@@ -1,0 +1,34 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: chat-mysql-db
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: chat_app_development
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3308:3306"
+
+  chat-app:
+    build: .
+    container_name: chat-rails-app
+    volumes:
+      - .:/app
+      - chat-storage:/app/storage
+    ports:
+      - "3000:3000"
+    environment:
+      - RAILS_ENV=development
+      - RAILS_LOG_TO_STDOUT=true
+      - DATABASE_HOST=db
+      - DATABASE_USER=root
+      - DATABASE_PASSWORD=password
+    depends_on:
+      - db
+    restart: always
+
+volumes:
+  mysql_data:
+  chat-storage:
