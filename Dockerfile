@@ -1,7 +1,5 @@
-# 1. Use the official AWS Public ECR mirror to completely bypass Docker Hub 429 rate limits
 FROM public.ecr.aws/docker/library/ruby:3.0.4-alpine
 
-# 2. Install essential system dependencies for building gems and database native extensions
 RUN apk add --no-cache \
     build-base \
     mysql-client \
@@ -12,34 +10,28 @@ RUN apk add --no-cache \
     gcompat \
     git
 
-# Set the working directory inside the container
 WORKDIR /app
 
-# 3. Copy dependency locks first to leverage Docker caching layers
+# Copy dependency files
 COPY Gemfile Gemfile.lock package.json yarn.lock ./
 
-# Tell bundler where to find mysql config headers on Alpine Linux
 RUN bundle config build.mysql2 --with-mysql-config=/usr/bin/mysql_config
 
-# 4. Bulletproof Multi-Step Fix for the mysql2 dependency error
-# Force add the Linux architecture, set local deployment mode, and execute the bundle build
+# Turn off deployment mode completely so bundler can fix the missing platforms dynamically
+RUN bundle config set --local deployment 'false'
 RUN bundle lock --add-platform x86_64-linux x86_64-linux-musl
-RUN bundle config set --local deployment 'true'
 RUN bundle install
 
-# Install javascript yarn dependencies
 RUN yarn install --frozen-lockfile
 
-# 5. Copy the rest of the chat application source code
+# Copy the rest of the application
 COPY . .
 
-# Set up compilation environment variables
 ENV RAILS_ENV=production
 ENV NODE_ENV=production
 
-# 6. Precompile assets for production inside the build stage using dummy placeholders
-RUN bundle lock --add-platform x86_64-linux x86_64-linux-musl && \
-    DATABASE_URL=mysql2://dummy_user:dummy_pass@localhost/dummy_db \
+# Precompile assets for production using dummy placeholders
+RUN DATABASE_URL=mysql2://dummy_user:dummy_pass@localhost/dummy_db \
     DATABASE_USER=dummy \
     DATABASE_PASSWORD=dummy \
     DATABASE_HOST=localhost \
@@ -49,8 +41,6 @@ RUN bundle lock --add-platform x86_64-linux x86_64-linux-musl && \
     RUBYOPT="-rlogger" \
     bundle exec rails assets:precompile
 
-# Expose the default app server port
 EXPOSE 3000
 
-# Start the application server
 CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
