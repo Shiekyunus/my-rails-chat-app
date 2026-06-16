@@ -1,6 +1,7 @@
+# 1. Use the official AWS Public ECR mirror to completely bypass Docker Hub 429 rate limits
 FROM public.ecr.aws/docker/library/ruby:3.0.4-alpine
 
-# Install essential system dependencies for building gems and compilation
+# 2. Install essential system dependencies for building gems and database native extensions
 RUN apk add --no-cache \
     build-base \
     mysql-client \
@@ -11,39 +12,44 @@ RUN apk add --no-cache \
     gcompat \
     git
 
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy dependency locks first to leverage Docker caching
+# 3. Copy dependency locks first to leverage Docker caching layers
 COPY Gemfile Gemfile.lock package.json yarn.lock ./
 
-# Tell bundler where to find mysql config headers on Alpine
+# Tell bundler where to find mysql config headers on Alpine Linux
 RUN bundle config build.mysql2 --with-mysql-config=/usr/bin/mysql_config
 
-# Install application dependencies
+# 4. Bulletproof Multi-Step Fix for the mysql2 dependency error
+# Force add the Linux architecture, set local deployment mode, and execute the bundle build
 RUN bundle lock --add-platform x86_64-linux
+RUN bundle config set --local deployment 'true'
 RUN bundle install
+
+# Install javascript yarn dependencies
 RUN yarn install --frozen-lockfile
 
-# Copy the rest of the chat application code
+# 5. Copy the rest of the chat application source code
 COPY . .
 
-# Precompile assets for production inside the build stage
+# Set up compilation environment variables
 ENV RAILS_ENV=production
 ENV NODE_ENV=production
 
-# Provide fake dummy placeholders so Rails doesn't crash during the asset build phase
+# 6. Precompile assets for production inside the build stage using dummy placeholders
 RUN DATABASE_URL=mysql2://dummy_user:dummy_pass@localhost/dummy_db \
     DATABASE_USER=dummy \
     DATABASE_PASSWORD=dummy \
     DATABASE_HOST=localhost \
     DATABASE_NAME=dummy \
     SECRET_KEY_BASE=75f6eb7e3aa4746833ac6785a3928123 \
-NODE_OPTIONS="--max-old-space-size=4096" \
+    NODE_OPTIONS="--max-old-space-size=4096" \
     RUBYOPT="-rlogger" \
     bundle exec rails assets:precompile
 
-# Expose the standard Rails port (and WebSocket channel port)
+# Expose the default app server port
 EXPOSE 3000
 
-# Clear any lingering server process IDs on boot and launch the Rails server
-CMD ["sh", "-c", "rm -f tmp/pids/server.pid && bundle exec rails server -b '0.0.0.0'"]
+# Start the application server
+CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
