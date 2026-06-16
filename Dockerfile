@@ -1,4 +1,4 @@
-FROM ruby:3.0.4-alpine
+FROM public.ecr.aws/docker/library/ruby:3.0.4-alpine
 
 # Install essential system dependencies for building gems and compilation
 RUN apk add --no-cache \
