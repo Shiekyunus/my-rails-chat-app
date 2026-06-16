@@ -1,5 +1,8 @@
 FROM public.ecr.aws/docker/library/ruby:3.0.4-alpine
 
+# ── System dependencies ────────────────────────────────────────────────────────
+# gcompat: provides glibc compatibility shim for musl Alpine
+# git: required by Bundler for gems sourced from git repos
 RUN apk add --no-cache \
     build-base \
     mysql-client \
@@ -12,26 +15,47 @@ RUN apk add --no-cache \
 
 WORKDIR /app
 
-# Copy dependency files
+# ── Bundler config BEFORE copying any files ────────────────────────────────────
+# Must come before COPY so config is in place when Gemfile.lock is read.
+# Disabling deployment mode lets Bundler modify the lockfile to add platforms.
+RUN bundle config set --local deployment 'false' && \
+    bundle config set --local without 'development test' && \
+    bundle config build.mysql2 --with-mysql-config=/usr/bin/mysql_config
+
+# ── Dependency files only (layer cache optimisation) ──────────────────────────
+# Copying these separately means Docker reuses the bundle install cache
+# on every build where only app code changed — not gem versions.
 COPY Gemfile Gemfile.lock package.json yarn.lock ./
 
-RUN bundle config build.mysql2 --with-mysql-config=/usr/bin/mysql_config
+# ── THE CORE PLATFORM FIX ─────────────────────────────────────────────────────
+# Your Gemfile.lock was generated on Windows (x64-mingw32).
+# Alpine uses x86_64-linux-musl. Bundler checks the PLATFORMS section
+# first and crashes immediately if the current platform isn't listed.
+# --add-platform appends entries without touching any gem versions.
+RUN bundle lock \
+      --add-platform x86_64-linux \
+      --add-platform x86_64-linux-musl
 
-# Turn off deployment mode completely so bundler can fix the missing platforms dynamically
-RUN bundle config set --local deployment 'false'
-RUN bundle lock --add-platform x86_64-linux x86_64-linux-musl
-RUN bundle install
+# ── Install gems & JS packages ────────────────────────────────────────────────
+RUN bundle install --jobs 4 --retry 3
 
 RUN yarn install --frozen-lockfile
 
-# Copy the rest of the application
+# ── Application source ────────────────────────────────────────────────────────
+# Copied AFTER gem/yarn install so that app-code changes don't invalidate
+# the expensive bundle/yarn cache layers above.
 COPY . .
 
-ENV RAILS_ENV=production
-ENV NODE_ENV=production
+# ── Environment ───────────────────────────────────────────────────────────────
+ENV RAILS_ENV=production \
+    NODE_ENV=production
 
-# Precompile assets for production using dummy placeholders
-RUN DATABASE_URL=mysql2://dummy_user:dummy_pass@localhost/dummy_db \
+# ── Asset precompilation ──────────────────────────────────────────────────────
+# DATABASE_URL and credentials are dummies — Rails boot requires them
+# to be set even though no real DB connection is made during compile.
+# NODE_OPTIONS guards against JS heap exhaustion on large asset graphs.
+# RUBYOPT=-rlogger surfaces Ruby-level errors that Rails silences by default.
+RUN DATABASE_URL=mysql2://dummy:dummy@localhost/dummy \
     DATABASE_USER=dummy \
     DATABASE_PASSWORD=dummy \
     DATABASE_HOST=localhost \
@@ -41,6 +65,6 @@ RUN DATABASE_URL=mysql2://dummy_user:dummy_pass@localhost/dummy_db \
     RUBYOPT="-rlogger" \
     bundle exec rails assets:precompile
 
+# ── Runtime ───────────────────────────────────────────────────────────────────
 EXPOSE 3000
-
 CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
