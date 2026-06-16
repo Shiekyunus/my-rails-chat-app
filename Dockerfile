@@ -20,6 +20,7 @@ COPY Gemfile Gemfile.lock package.json yarn.lock ./
 RUN bundle config build.mysql2 --with-mysql-config=/usr/bin/mysql_config
 
 # Install application dependencies
+RUN bundle lock --add-platform x86_64-linux
 RUN bundle install
 RUN yarn install --frozen-lockfile
 
