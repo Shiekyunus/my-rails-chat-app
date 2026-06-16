@@ -23,7 +23,7 @@ RUN bundle config build.mysql2 --with-mysql-config=/usr/bin/mysql_config
 
 # 4. Bulletproof Multi-Step Fix for the mysql2 dependency error
 # Force add the Linux architecture, set local deployment mode, and execute the bundle build
-RUN bundle lock --add-platform x86_64-linux
+RUN bundle lock --add-platform x86_64-linux x86_64-linux-musl
 RUN bundle config set --local deployment 'true'
 RUN bundle install
 
