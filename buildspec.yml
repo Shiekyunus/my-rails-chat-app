@@ -1,0 +1,32 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - AWS_ACCOUNT_ID="947792709243"
+      - REPOSITORY_NAME="shiek-manual-ror-app"
+      - SERVICE_NAME="shiek-manual-chat-app-ror-taskdefinition-service-5zh5f7rv"
+      - CONTAINER_NAME="shiek-manual-chat-app-container"
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com
+
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      - docker build -t ${REPOSITORY_NAME}:latest .
+      - docker tag ${REPOSITORY_NAME}:latest ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${REPOSITORY_NAME}:latest
+
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker image...
+      - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${REPOSITORY_NAME}:latest
+      - echo Writing image definitions file for ECS...
+      - printf '[{"name":"%s","imageUri":"%s"}]' "${CONTAINER_NAME}" "${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${REPOSITORY_NAME}:latest" > imagedefinitions.json
+      - echo Build and configuration artifacts generation complete!
+
+artifacts:
+  files:
+    - imagedefinitions.json
