@@ -46,15 +46,13 @@ RUN yarn install --frozen-lockfile
 # the expensive bundle/yarn cache layers above.
 COPY . .
 
+RUN bundle config set --local deployment 'false'
 # ── Environment ───────────────────────────────────────────────────────────────
 ENV RAILS_ENV=production \
     NODE_ENV=production
 
-# ── Asset precompilation ──────────────────────────────────────────────────────
-# DATABASE_URL and credentials are dummies — Rails boot requires them
-# to be set even though no real DB connection is made during compile.
-# NODE_OPTIONS guards against JS heap exhaustion on large asset graphs.
-# RUBYOPT=-rlogger surfaces Ruby-level errors that Rails silences by default.
+
+
 RUN DATABASE_URL=mysql2://dummy:dummy@localhost/dummy \
     DATABASE_USER=dummy \
     DATABASE_PASSWORD=dummy \
@@ -64,6 +62,21 @@ RUN DATABASE_URL=mysql2://dummy:dummy@localhost/dummy \
     NODE_OPTIONS="--max-old-space-size=4096" \
     RUBYOPT="-rlogger" \
     bundle exec rails assets:precompile
+
+# ── Asset precompilation ──────────────────────────────────────────────────────
+# DATABASE_URL and credentials are dummies — Rails boot requires them
+# to be set even though no real DB connection is made during compile.
+# NODE_OPTIONS guards against JS heap exhaustion on large asset graphs.
+# RUBYOPT=-rlogger surfaces Ruby-level errors that Rails silences by default.
+#RUN DATABASE_URL=mysql2://dummy:dummy@localhost/dummy \
+#    DATABASE_USER=dummy \
+#    DATABASE_PASSWORD=dummy \
+#    DATABASE_HOST=localhost \
+#    DATABASE_NAME=dummy \
+#    SECRET_KEY_BASE=75f6eb7e3aa4746833ac6785a3928123 \
+#    NODE_OPTIONS="--max-old-space-size=4096" \
+#    RUBYOPT="-rlogger" \
+#    bundle exec rails assets:precompile
 
 # ── Runtime ───────────────────────────────────────────────────────────────────
 EXPOSE 3000
