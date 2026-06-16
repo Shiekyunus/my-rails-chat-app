@@ -71,4 +71,4 @@ ENV RAILS_ENV=production \
 
 # ── Runtime ───────────────────────────────────────────────────────────────────
 EXPOSE 3000
-CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
+CMD ["bin/bundle", "exec", "puma", "-C", "config/puma.rb"]
