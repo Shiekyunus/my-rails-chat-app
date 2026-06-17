@@ -8,7 +8,7 @@ class User < ApplicationRecord
 
   has_many :conversation_participants
   has_many :conversations, through: :conversation_participants
-  has_many :messages
+  has_many :messages, dependent: :destroy
   has_one_attached :profile_image
 
   after_create :send_welcome_email
