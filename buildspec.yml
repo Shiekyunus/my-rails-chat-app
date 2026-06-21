@@ -11,9 +11,9 @@ phases:
       - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com
   build:
     commands:
-      - echo "Purging all operational data from database..."
-      - docker run --rm 947792709243.dkr.ecr.us-east-1.amazonaws.com/shiek-manual-ror-app:latest bundle exec rails runner "ActiveRecord::Base.connection.execute('SET FOREIGN_KEY_CHECKS = 0;'); Message.delete_all; Conversation.delete_all; User.delete_all; ActiveRecord::Base.connection.execute('SET FOREIGN_KEY_CHECKS = 1;')" || true
-      - echo "Proceeding with standard build..."
+      - echo "Building Docker image..."
+      - docker build -t ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${REPOSITORY_NAME}:latest .
+      - echo "Build complete!"
   post_build:
     commands:
       - echo Build completed on `date`
