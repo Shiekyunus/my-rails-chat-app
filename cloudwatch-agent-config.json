@@ -1,0 +1,31 @@
+{
+  "agent": {
+    "run_as_user": "root"
+  },
+  "logs": {
+    "logs_collected": {
+      "files": {
+        "collect_list": [
+          {
+            "file_path": "/app/log/production.log",
+            "log_group_name": "/ecs/shiek-terraform/ror/application",
+            "log_stream_name": "{instance_id}-application",
+            "timestamp_format": "%Y-%m-%dT%H:%M:%S"
+          },
+          {
+            "file_path": "/app/log/puma.log",
+            "log_group_name": "/ecs/shiek-terraform/ror/puma",
+            "log_stream_name": "{instance_id}-puma",
+            "timestamp_format": "%Y-%m-%dT%H:%M:%S"
+          },
+          {
+            "file_path": "/app/log/error.log",
+            "log_group_name": "/ecs/shiek-terraform/ror/errors",
+            "log_stream_name": "{instance_id}-errors",
+            "timestamp_format": "%Y-%m-%dT%H:%M:%S"
+          }
+        ]
+      }
+    }
+  }
+}
