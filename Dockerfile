@@ -9,7 +9,6 @@ RUN apt-get update && apt-get install -y \
     curl \
     unzip \
     gnupg \
-    supervisor \
     && rm -rf /var/lib/apt/lists/*
 
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
@@ -65,8 +64,9 @@ RUN mkdir -p /app/log && \
     touch /app/log/error.log
 
 COPY cloudwatch-agent-config.json /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
-COPY supervisord.conf /etc/supervisord.conf
+COPY start.sh /app/start.sh
+
+RUN chmod +x /app/start.sh
 
 EXPOSE 3000
-
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+CMD ["/app/start.sh"]
