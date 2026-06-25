@@ -41,6 +41,7 @@ RUN bundle config set --local deployment 'false'
 
 ENV RAILS_ENV=production \
     NODE_ENV=production
+ENV NODE_OPTIONS=--openssl-legacy-provider
 
 RUN DATABASE_USER=dummy \
     DATABASE_PASSWORD=dummy \
